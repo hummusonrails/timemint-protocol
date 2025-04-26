@@ -1,0 +1,99 @@
+# === Node, React, Vite, and Monorepo ===
+# Node modules
+**/node_modules/
+
+# Vite/React build outputs
+**/dist/
+**/build/
+**/.next/
+**/.turbo/
+
+# Vite cache
+**/.vite/
+
+# pnpm
+**/pnpm-lock.yaml
+.pnpm-debug.log
+
+# npm
+**/package-lock.json
+npm-debug.log*
+
+# Yarn
+**/yarn.lock
+yarn-debug.log*
+yarn-error.log*
+
+# Logs
+*.log
+
+# .env files
+**/.env
+**/.env.*
+
+# IDE/editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime*
+.DS_Store
+Thumbs.db
+
+# Mac system files
+.DS_Store
+
+# OS generated files
+Icon?
+
+# === Rust/Stylys/Contracts ===
+# Rust target dir
+**/target/
+
+# Cargo
+**/Cargo.lock
+
+# Stylus build artifacts
+**/artifacts/
+
+# === Test/coverage ===
+coverage/
+**/coverage/
+**/test-results/
+**/.nyc_output/
+
+# === Misc ===
+*.bak
+*.tmp
+*.old
+
+# === Serverless/.vercel ===
+.vercel/
+.netlify/
+
+# === Images, logos, and design source ===
+images/*.xcf
+images/*.psd
+images/*.ai
+images/*.sketch
+
+# === Python (if any backend scripts) ===
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+
+# === Ignore local dev scripts ===
+scripts/local/
+
+# === Ignore local database files ===
+*.sqlite
+*.db
+*.sqlite3
+
+# === Ignore lock files for all package managers ===
+**/pnpm-lock.yaml
+**/yarn.lock
+**/package-lock.json
+
+# === Ignore VSCode settings ===
+**/.vscode/
