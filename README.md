@@ -1,8 +1,8 @@
 # TimeMint Protocol
 
 <p align="center">
-  <img src="images/logo-light.png#gh-light-mode-only" width="320" height="80" alt="Project Logo"/>
-  <img src="images/logo-dark.png#gh-dark-mode-only" width="320" height="80" alt="Project Logo"/>
+  <img src="images/logo-light.png#gh-light-mode-only" alt="Project Logo"/>
+  <img src="images/logo-dark.png#gh-dark-mode-only" alt="Project Logo"/>
 </p>
 
 Tokenize your time. Book meetings onchain.
