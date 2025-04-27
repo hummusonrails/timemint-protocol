@@ -3,7 +3,7 @@ import { getProvider, getContract, requestAccount } from './web3';
 
 export interface TimeMintBookingProps {
   contractAddress: string;
-  siteId: string; // NEW: required for secure booking
+  siteId: string; 
   useGoogleCalendar?: boolean;
   maxBookingSlots?: number;
   bookingStartHour?: number;
@@ -160,7 +160,7 @@ export function TimeMintBooking({
     fetchGoogleCalendarSlots();
   }, [useGoogleCalendar, googleToken, maxBookingSlots, bookingStartHour, bookingEndHour, bookingDays]);
 
-  // Book slot using contract (now uses siteId)
+  // Book slot using contract
   async function bookSlot(slot: Slot, email: string) {
     setTxStatus('Booking...');
     try {
@@ -171,7 +171,6 @@ export function TimeMintBooking({
       const provider = getProvider();
       const signer = await provider.getSigner();
       const contract = await getContract(signer, contractAddress);
-      // NEW: call book_slot(siteId, start, end) with fee
       const fee = await contract.booking_fee();
       const tx = await contract.book_slot(siteId, slot.start, slot.end, { value: fee });
       await tx.wait();
