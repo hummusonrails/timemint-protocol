@@ -1,0 +1,13 @@
+{
+  "name": "timemint-protocol",
+  "private": true,
+  "version": "0.0.0",
+  "workspaces": [
+    "contracts",
+    "packages/*",
+    "examples/*"
+  ],
+  "devDependencies": {
+    "tailwindcss-cli": "^0.1.2"
+  }
+}
