@@ -22,7 +22,7 @@ impl Erc721Params for BookingParams {
     const NAME: &'static str = "TimeMint Slot";
     const SYMBOL: &'static str = "TMSLOT";
     fn token_uri(token_id: U256) -> String {
-        let mut s = "https://timemint.xyz/api/slot/".to_string();
+        let mut s = "https://timemint-api.onrender.com/slot/".to_string();
         s.push_str(&token_id.to_string());
         s.push_str(".json");
         s
@@ -55,7 +55,6 @@ sol! {
     event Transfer(address indexed from, address indexed to, uint256 indexed token_id);
     event Approval(address indexed owner, address indexed approved, uint256 indexed token_id);
     event ApprovalForAll(address indexed owner, address indexed operator, bool approved);
-    // Removed unused errors to reduce WASM size
 }
 
 #[derive(SolidityError, Debug)]
@@ -99,7 +98,6 @@ impl<T: Erc721Params> Erc721<T> {
             return Err(Erc721Error::NotOwner(self::NotOwner { from, token_id, real_owner: previous_owner }));
         }
         owner.set(to);
-        // Fix borrow checker: retrieve values before mutably borrowing
         {
             let from_balance_val = self.balances.get(from);
             self.balances.setter(from).set(from_balance_val - U256::from(1));
@@ -113,7 +111,6 @@ impl<T: Erc721Params> Erc721<T> {
         Ok(())
     }
     fn call_receiver<S: TopLevelStorage + HostAccess>(storage: &mut S, token_id: U256, from: Address, to: Address, data: Vec<u8>) -> Result<(), Erc721Error> {
-        // Store vm() in a variable before mutable borrow
         let vm = storage.vm();
         if vm.code(to).len() > 0 {
             let receiver = IERC721TokenReceiver::new(to);
@@ -269,6 +266,13 @@ impl From<BookingError> for String {
 
 #[public]
 impl TimeMint {
+    /// Initialize the contract with the admin address. Can only be called once.
+    ///
+    /// # Parameters
+    /// * `admin`: The address of the admin who will manage the contract.
+    ///
+    /// # Returns
+    /// A `Result` indicating whether the initialization was successful.
     pub fn init(&mut self, admin: Address) -> Result<(), String> {
         if self.admin_key.get() != [0u8; 32] {
             return Err("Already initialized".to_string());
@@ -280,6 +284,13 @@ impl TimeMint {
     }
 
     /// Register a site creator for a given site_id. Can only be set once per site_id.
+    ///
+    /// # Parameters
+    /// * `site_id`: The ID of the site being registered.
+    /// * `creator`: The address of the creator being registered.
+    ///
+    /// # Returns
+    /// A `Result` indicating whether the registration was successful.
     pub fn register_site(&mut self, site_id: String, creator: Address) -> Result<(), String> {
         let mut arr = [0u8; 32];
         let bytes = site_id.as_bytes();
@@ -299,6 +310,12 @@ impl TimeMint {
     }
 
     /// Set the global booking fee (admin only)
+    ///
+    /// # Parameters
+    /// * `new_fee`: The new booking fee to be set.
+    ///
+    /// # Returns
+    /// A `Result` indicating whether the fee was set successfully.
     pub fn set_booking_fee(&mut self, new_fee: U256) -> Result<(), String> {
         let caller = self.vm().msg_sender();
         let admin_bytes = self.admin_key.get();
@@ -311,6 +328,14 @@ impl TimeMint {
     }
 
     /// Book a slot for a given site_id. Fee is split between creator and admin.
+    ///
+    /// # Parameters
+    /// * `site_id`: The ID of the site being booked.
+    /// * `start`: The start time of the slot being booked.
+    /// * `end`: The end time of the slot being booked.
+    ///
+    /// # Returns
+    /// A `Result` containing the token ID of the newly booked slot, or an error message.
     pub fn book_slot(&mut self, site_id: String, start: U256, end: U256) -> Result<U256, String> {
         let mut arr = [0u8; 32];
         let bytes = site_id.as_bytes();
@@ -344,6 +369,9 @@ impl TimeMint {
     }
 
     /// Withdraw accumulated balance (for creators and admin)
+    ///
+    /// # Returns
+    /// A `Result` indicating whether the withdrawal was successful.
     pub fn withdraw(&mut self) -> Result<(), String> {
         let caller = self.vm().msg_sender();
         let amount = self.user_balances.get(caller);
@@ -355,6 +383,13 @@ impl TimeMint {
         Ok(())
     }
 
+    /// Returns all slot token IDs created by the given creator address.
+    ///
+    /// # Parameters
+    /// * `creator`: The address of the creator whose slots are being queried.
+    ///
+    /// # Returns
+    /// A vector of slot token IDs.
     pub fn slots_of_creator(&self, creator: Address) -> Vec<U256> {
         let count = self.creator_count.get(creator);
         let mut slots = Vec::new();
@@ -370,6 +405,13 @@ impl TimeMint {
         slots
     }
 
+    /// Returns all slot token IDs owned by the given owner address.
+    ///
+    /// # Parameters
+    /// * `owner`: The address of the owner whose slots are being queried.
+    ///
+    /// # Returns
+    /// A vector of slot token IDs.
     pub fn slots_of_owner(&self, owner: Address) -> Vec<U256> {
         let count = self.owner_count.get(owner);
         let mut slots = Vec::new();
@@ -385,6 +427,13 @@ impl TimeMint {
         slots
     }
 
+    /// Returns the creator, start, and end time for a given slot token ID.
+    ///
+    /// # Parameters
+    /// * `token_id`: The ID of the slot being queried.
+    ///
+    /// # Returns
+    /// A tuple containing the creator, start, and end time of the slot.
     pub fn slot_metadata(&self, token_id: U256) -> (Address, U256, U256) {
         let creator = self.creators.get(token_id);
         let start = self.slot_start.get(token_id);
@@ -396,10 +445,27 @@ impl TimeMint {
         }
     }
 
+    /// ERC-721 receiver hook for safe transfers. Always returns the expected selector.
+    ///
+    /// # Parameters
+    /// * `_operator`: The operator who initiated the transfer.
+    /// * `_from`: The address from which the token was transferred.
+    /// * `_token_id`: The ID of the token being transferred.
+    /// * `_data`: Additional data provided with the transfer.
+    ///
+    /// # Returns
+    /// The expected selector for ERC-721 receiver hooks.
     pub fn on_erc721_received(&mut self, _operator: Address, _from: Address, _token_id: U256, _data: Vec<u8>) -> [u8; 4] {
         [0x15, 0x0b, 0x7a, 0x02]
     }
 
+    /// Debug utility: Returns all slot IDs owned by the given address (for testing).
+    ///
+    /// # Parameters
+    /// * `owner`: The address whose slots are being queried.
+    ///
+    /// # Returns
+    /// A vector of slot IDs.
     pub fn debug_owner_info(&self, owner: Address) -> Vec<U256> {
         let count = self.owner_count.get(owner);
         let mut slots = Vec::new();
