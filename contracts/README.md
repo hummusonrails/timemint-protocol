@@ -31,19 +31,21 @@ All public functions are documented with Rust doc comments in the source code (`
 - `slots_of_owner(owner: Address)`: List all slot token IDs owned by a given address.
 - ERC-721 methods: `transfer`, `approve`, `mint`, `burn`, etc.
 
-## Building & Testing
+## Building & Deployment
 
-You need [pnpm](https://pnpm.io/) and [Stylus CLI](https://docs.arbitrum.io/stylus/) installed. From the repo root:
+You need [Stylus CLI](https://docs.arbitrum.io/stylus/) installed. From the repo root:
 
 ```sh
-pnpm install
-pnpm --filter contracts build
-pnpm --filter contracts test
+cd contracts
+cargo stylus check       # Check contract for ability to be deployed
+cargo stylus deploy      # Deploy the contract
 ```
 
-## Deployment
+Read more about the CLI on [the docs](https://docs.arbitrum.io/stylus/) or by outputting the `--help` flag:
 
-Deploy using the Stylus CLI, read the [Stylus documentation](https://docs.arbitrum.io/stylus/quickstart#deploying-your-contract) quickstart guide for more details.
+```sh
+cargo stylus --help
+```
 
 ## License
 
