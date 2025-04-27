@@ -4,7 +4,9 @@
   "main": "dist/index.js",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "sideEffects": false,
   "private": false,
   "scripts": {
@@ -20,5 +22,22 @@
   "devDependencies": {
     "typescript": "^5.0.0"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hummusonrails/timemint-protocol.git"
+  },
+  "author": "hummusonrails",
+  "description": "React component for TimeMint protocol booking widgets.",
+  "keywords": [
+    "timemint",
+    "react",
+    "booking",
+    "nft",
+    "calendar"
+  ],
+  "homepage": "https://github.com/hummusonrails/timemint-protocol#readme",
+  "bugs": {
+    "url": "https://github.com/hummusonrails/timemint-protocol/issues"
+  }
 }
